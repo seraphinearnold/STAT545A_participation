@@ -128,11 +128,6 @@ flights %>%
 
 ## Types of filtering join
 
-```{r}
-
-```
-
-
 ### Let's filter tibbles using two filtering functions: `semi_join`, `anti_join` 
 
 ```{r}
@@ -212,13 +207,23 @@ intersect(y, z)  #error because they have to have identical columns. If they don
 
 ### example for `bind_rows`: Append `z` to `y` as new rows
 
+```{r}
+bind_rows(y, z)
+```
 
 
 ### example for `bind_cols`: Append `z` to `y` as new columns. __Caution__: matches rows by position. Check colnames after binding.
 
+```{r}
+bind_cols(y, z)
+```
+
 
 ### what happen if colnames are different between `y` and `x` datasets?
 
+```{r}
+bind_cols(y, x)
+```
 
 ##Practice Exercises
 Practice these concepts in the following exercises. It might help you to first identify the type of function you are applying.
@@ -226,13 +231,32 @@ Practice these concepts in the following exercises. It might help you to first i
 
 ### 1. Filter the rows of `flights2` by matching "year" and "time_hour" variables to `weather` dataset. Use both `semi_join()` and `anti_join()`
 
+```{r}
+semi_join(flights2, weather) # all match and can be joined
+anti_join(flights2, weather) #0 we cannot find any mismatch
+
+```
 
 
 ### 2. Can we apply `set` and `binding` funcions between `flights2` and `weather` datasets. Why and why not?
 
+```{r}
+union(flights2, weather)
+bind_rows(flights2, weather)
+bind_cols(flights2, weather)  # you can't bind cols, because there is a different number of rows
+```
+
+
 
 ### 3. Let's create a tibble `p` with "x1" and "x2" coulmns and have duplicated element in "x1" column. Create another tibble `q` with "x1" and "x3" columns. Then apply `left_join` function `p` to `q` and `q` to `p`. 
 
+```{r}
+(p <- tibble(x1 = c("a", "b", "b", "c"), x2 = 1:4))
+(q <- tibble(x1 = c("a", "b", "c", "c"), x3 = 5:8))
+
+left_join(p, q)
+left_join(q, p)
+```
 
 
 
