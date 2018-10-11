@@ -124,8 +124,11 @@ bind_rows(lotr1, lotr2) %>% str() #A bit more strict function than rbind(), so y
 Levels don't always have to be present ("observed") in the factor. Example of what this means:
 
 ```{r}
-gap_gs <- gapminder %>% filter(country %in% c("Germany", "Sweden"))
+gap_gs <- gapminder %>%
+  filter(country %in% c("Germany", "Sweden"))
 nlevels(gap_gs$country)
+levels(gap_gs$country)
+as.character(gap_gs$country)
 ```
 
 
