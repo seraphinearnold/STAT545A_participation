@@ -250,9 +250,12 @@ Note that not all special characters "work" within `[]`, but some do, and do not
 Exercise: Find all countries with three non-vowels next to each other.
 
 ```{r}
-str_view_all_match(countries, pattern = "YOUR_REGEX_HERE")
+str_view_all_match(countries, pattern = "^aeiou")
 ```
 
+```{r}
+str_view_all_match(countries, pattern = "[^aeiou][^aeiou][^aeiou]")
+```
 
 ### Or
 
@@ -295,7 +298,7 @@ str_view_all_match(countries, "e{2}")
 Exercise: Find all countries that have either "a" or "e", twice in a row (with a changeover allowed, such as "ae" or "ea"):
 
 ```{r}
-str_view_all_match(countries, pattern="YOUR_REGEX_HERE")
+str_view_all_match(countries, pattern="(a|e)(a|e)")
 ```
 
 
