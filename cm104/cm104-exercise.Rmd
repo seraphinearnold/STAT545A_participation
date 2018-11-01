@@ -68,7 +68,7 @@ pmap(list(a, b, c), function(x, y, z) x*y*z)
 pmap(list(a, b, c), ~ ..1 * ..2 * ..3)
 ```
 ```{r}
-pmap_dbl(list(a, b, c), ~ ..1 * ..2 * ..3)
+pmap_dbl(list(a, b, c), ~ ..1 * ..2 * ..3)  #dbl = double mapping
 ```
 
 ## Your Turn
@@ -83,26 +83,30 @@ name <- c("Parveen", "Kayden", "Shawn")
 use `map2_chr()` to come up with the following output in three ways:
 
 ```{r}
-str_c(name, " takes ", commute, " minutes to get to work.")
+str_c(name, " takes ", commute, " minutes to get to work.") #output we'er looking for
 ```
 
-1. By defining a function before feeding it into `map2()` -- call it `comm_fun`.
+
+1. By defining a function before feeding it into `map2_chr()` -- call it `comm_fun`.
 
 ```{r}
-comm_fun <- FILL_THIS_IN
-map2(FILL_THIS_IN, FILL_THIS_IN, FILL_THIS_IN)
+comm_fun <- function(s, t)
+  str_c(name, " takes ", commute, " minutes to get to work.")  #defined function
+map2_chr(name, commute, comm_fun)
 ```
 
 2. By defining a function "on the fly" within the `map2()` function.
 
 ```{r}
-map2(name, commute, function(t, s) FILL_THIS_IN)
+map2_chr(name, commute, function(t, s)  {
+  str_c(s, " takes ", t, " minutes to get to work.")
+  })
 ```
 
 3. By defining a formula.
 
 ```{r}
-map2(name, commute, ~ FILL_THIS_IN)
+map2_chr(name, commute, ~  str_c(.x, " takes ", .y, " minutes to get to work."))
 ```
 
 
@@ -142,7 +146,13 @@ This is where `map()` comes in handy! Let's make a tibble using the `got_chars` 
 2. Specify the columns with `purrr` mappings.
 
 ```{r}
-got_alias <- got_chars %>% FILL_THIS_IN
+#got_chars   #got = game of thrones
+             #we want a tibble with the first entry of name and than aliases
+got_alias <- got_chars %>% {
+  tibble(name = map_chr(., "name"),
+         aliases = map(., "aliases"))
+}
+ got_alias
 ```
 
 Write the solution down carefully -- we'll be referring to `got_alias` later. 
@@ -158,9 +168,11 @@ Approach 1: Without piping
 3. Subset the newly-named list to Melisandre.
 
 ```{r}
-(alias_list <- FILL_THIS_IN)
-names(alias_list) <- FILL_THIS_IN
-SUBSET_HERE
+(alias_list <- got_alias$aliases)
+names(alias_list) <- got_alias$name
+alias_list
+#SUBSET_HERE -> see next row
+alias_list [["Melisandre"]]
 ```
 
 Approach 2: With piping
@@ -169,7 +181,9 @@ Approach 2: With piping
 2. Then, pipe that into a subsetting function to subset Melisandre.
 
 ```{r}
-got_alias %>% FILL_THIS_IN
+got_alias %>% 
+  {setNames(.Saliases, .$name)} %>% 
+  `[[` ("Melisandre")
 ```
 
 ## Nesting/Unnesting; Operating
@@ -212,7 +226,12 @@ From list-column data:
 
 ```{r}
 icecream %>% 
-  filter(map_lgl(flav, ~ FILL_THIS_IN))
+  filter(map_lgl(flav, ~ FILL_THIS_IN))  #map_lgl = map logical / flav is a list of 3
+```
+
+```{r}
+icecream %>% 
+  filter(map_lgl(flav, ~ any(.x == "strawberry"))) # x is icecream and we want any to be equal to strawberry 
 ```
 
 
@@ -221,7 +240,10 @@ icecream %>%
 `unnest()` the `got_alias` tibble. Hint: there should be a hiccup. Check out the `str()`ucture of `got_alias` -- are all elements of the list column vectors? Would using `tidyr::drop_na()` be a good idea here?
 
 ```{r}
-FILL_THIS_IN
+str(got_alias)
+got_alias %>% 
+  drop_na() %>% #to get rid of the list with NULL
+  unnest()      #now we can unnest
 ```
 
 We can also do the opposite with `tidyr::nest()`. Try it with the `iris` data frame:
@@ -230,7 +252,9 @@ We can also do the opposite with `tidyr::nest()`. Try it with the `iris` data fr
 2. `nest()`!
 
 ```{r}
-FILL_THIS_IN
+iris %>% 
+  group_by(Species) %>%  #does the opposite than the function before
+  nest()
 ```
 
 Keep the nested `iris` data frame above going! Keep piping:
