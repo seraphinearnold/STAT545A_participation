@@ -6,27 +6,20 @@ bcl <- read.csv("/Users/Seraphine/Documents/stat545/New participation/STAT545A_p
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-   "This is some text",
-   "This is more text",
-   tags$h1("Level 1 header, part 2"),
-   HTML("<h1>Level 1 header, part 3</h1>"), # optional you can write in html code with the HTML function
-   tags$b("This text is bold."),
-   tags$div(
-     "Some text followed by a break", 
-     tags$br(),
-     "Some text following a break"
-   ),
-   tags$blockquote("He who lives without a state must be a beast or a god.", cite = "Aristoteles"),
-   a(href="https://www.google.ca", "Link to google"),
-   
-   titlePanel("BC Liquor price app", 
-              windowTitle = "BCL app"),
-   sidebarLayout(
-     sidebarPanel("This text is in the sidebar."),
-     mainPanel(
-       #ggplot2::qplot(bcl$Price)) #we cannot put not html code in there, we need to put that to the server function
-       plotOutput("price_hist"), # in quotation marks the identify id
-       tableOutput("bcl_data")
+  titlePanel("BC Liquor price app", 
+             windowTitle = "BCL app"),
+  sidebarLayout(
+    sidebarPanel(
+      sliderInput("priceInput", "Select your desired price range.",
+                  min = 0, max = 100, value = c(15, 30), pre="$"),
+      radioButtons("typeInput", "Select your alcohol baverage",
+                   choices = c("BEER", "REFRESHMENT", "SPIRITS", "WINE"),
+                   selected = "WINE")
+    ),
+    mainPanel(
+      #ggplot2::qplot(bcl$Price)) #we cannot put not html code in there, we need to put that to the server function
+      plotOutput("price_hist"), # in quotation marks the identify id
+      tableOutput("bcl_data")
     )
   )
 )
@@ -34,10 +27,24 @@ ui <- fluidPage(
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-    output$price_hist <- renderPlot(ggplot2::qplot(bcl$Price))
-    output$bcl_data <- renderTable(bcl)
+  observe(print(input$priceInput))
+  bcl_filtered <- reactive ({
+    bcl %>% 
+      filter(Price < input$priceInput[2],
+             Price > input$priceInput[1],
+             Type == input$TypeInput)
+  })
+  
+  output$price_hist <- renderPlot({
+    bcl_filtered() %>% 
+      ggplot2(aes(Price)) +
+      geom_histogram()
+  })
+  output$bcl_data <- renderTable({
+  bcl_filtered()
+})
 }
-   
+
 
 # Run the application 
 shinyApp(ui = ui, server = server)
